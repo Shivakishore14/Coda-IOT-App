@@ -4,13 +4,12 @@
  * and open the template in the editor.
  */
 
+import myutil.myUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import javax.servlet.http.*;
+import org.json.simple.*;
 /**
  *
  * @author user
@@ -28,14 +27,22 @@ public class login extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String username = request.getParameter("email");
+        HttpSession session = request.getSession(true);
+        String email = request.getParameter("email");
         String password = request.getParameter("password");
         PrintWriter out = response.getWriter();
-        boolean isValid = new myUtil().isValidLogin(username, password);
+        boolean isValid = new myUtil().isValidLogin(email, password);
         if ( isValid ){
-            out.print("logged in");
+            JSONObject o = new myUtil().getUserDetails(email, true);
+            String id = (String)o.get("id");
+            String name = (String)o.get("fname") +" "+ (String)o.get("lname");
+            session.setAttribute("email", email);
+            session.setAttribute("userid", id);
+            session.setAttribute("name", name);
+            response.sendRedirect("dashboard.jsp");
         }else{
-            out.print("not valid");
+            session.invalidate();
+            response.sendRedirect("login.jsp?invalid=try%20again");
         }
     }
 

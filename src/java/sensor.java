@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 
-import myutil.myUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -12,13 +11,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import org.json.simple.JSONObject;
+import myutil.myUtil;
 /**
  *
  * @author user
  */
-@WebServlet(urlPatterns = {"/hello"})
-public class hello extends HttpServlet {
+@WebServlet(urlPatterns = {"/sensor"})
+public class sensor extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,19 +32,36 @@ public class hello extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        new myUtil().test();
-        System.out.println("#########################");
+        
+        String action = request.getParameter("action");
+        JSONObject jo = new JSONObject();
+        if (action == null){
+            jo.put("message","provide an action");
+        }else if(action.equals("get")){
+            String id = request.getParameter("id");
+            jo = new myUtil().getSensorData(id);
+        }else if(action.equals("put")){
+            String timeStamp = request.getParameter("timestamp");
+            String id = request.getParameter("id");
+            String cid = request.getParameter("cid");
+            String secret = request.getParameter("secret");
+            String value = request.getParameter("value");
+            
+            jo = new myUtil().storeSensorData(id, timeStamp, secret, cid, value);
+        }else if(action.equals("create")){
+            String type = request.getParameter("type");
+            String cid = request.getParameter("cid");
+            
+            jo = new myUtil().createSensor(type, cid);
+        }else if(action.equals("list")){
+            String cid = request.getParameter("cid");
+            
+            jo = new myUtil().listSensors(cid);
+        }
+        
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Sjjjjjervlet hello</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet hello at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            out.print(jo);
         }
     }
 

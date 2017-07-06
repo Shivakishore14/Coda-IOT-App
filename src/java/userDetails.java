@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+
 import myutil.myUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,13 +13,15 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author user
  */
-@WebServlet(urlPatterns = {"/hello"})
-public class hello extends HttpServlet {
+@WebServlet(urlPatterns = {"/userDetails"})
+public class userDetails extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,19 +35,18 @@ public class hello extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        new myUtil().test();
-        System.out.println("#########################");
+        HttpSession session = request.getSession();
+        String email = request.getParameter("email");
+        String currentEmail = (String)session.getAttribute("email");
+        boolean isAuthenticated = false;
+        if (currentEmail != null){
+            isAuthenticated = true;
+        }
+        JSONObject jo = new myUtil().getUserDetails(email, isAuthenticated);
+        
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Sjjjjjervlet hello</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet hello at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            out.print(jo);
         }
     }
 

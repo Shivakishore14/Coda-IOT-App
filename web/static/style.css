@@ -13,3 +13,39 @@ and open the template in the editor.
 .full-width {
     width:100%;
 }
+.sensor{
+    display: inline-block;
+    width: 150px;
+    margin: 10px;
+    padding : 5px;
+}
+#wrapper {
+    display: inline-block;
+}
+#notification{
+	height:28px;
+	position:fixed;
+	bottom:0%;
+	width:100%; 
+	display:none;
+	z-index:15;
+	opacity:0.8;
+}
+#notificationArea{
+	background-color:#222;
+	color:#FFF;
+	size:15px;
+	text-align: center;
+	border-radius: 10px 10px 0px 0px;
+	font-size: 20px;
+}
+.add{
+    position: static;
+    float: right;
+    font-size:20px;
+    color:#aaa;
+    cursor:pointer;
+}
+.add:hover{
+    color:#FFF;
+}

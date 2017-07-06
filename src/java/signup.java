@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
+import myutil.myUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.*;
+import org.json.simple.*;
 
 /**
  *
@@ -29,6 +29,9 @@ public class signup extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        HttpSession session = request.getSession();
+        session.invalidate();
+        JSONObject jo = new JSONObject();
         PrintWriter out = response.getWriter();
         String email = request.getParameter("email");
         String phone = request.getParameter("phone");
@@ -37,10 +40,11 @@ public class signup extends HttpServlet {
         String password = request.getParameter("password");
         int changes = new myUtil().signup(email, lname, fname, password, phone);
         if (changes == 1){
-            out.print("Done");
+            jo.put("message", "done");
         }else{
-            out.print("try again");
+            jo.put("message","try again");
         }
+        out.print(jo);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

@@ -5,6 +5,10 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    HttpSession s = request.getSession();
+    s.invalidate();
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,7 +21,9 @@
         <title>Login Page</title>
     </head>
     <body>
-        <h1>Login</h1>
+        <center>
+            <h1>Login</h1>
+        </center>
         <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
@@ -32,9 +38,15 @@
                         </div>
                         <div class="input-group row full-width">
                             <div class="col-md-4 col-md-offset-4">
-                                <input type="submit" class="btn btn-success full-width"/>
-                            <div>
+                                <input type="submit" class="btn btn-info full-width"/>
+                            </div>
                         </div>
+                        <% 
+                            String t = request.getParameter("invalid");
+                            if( t != null){
+                                out.print("<br><div  class=\"list-group-item list-group-item-danger\">"+t+"</div>");
+                            }
+                        %>
                     </form>
                 </div>
             </div>

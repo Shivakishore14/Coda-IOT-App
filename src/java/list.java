@@ -8,17 +8,17 @@ import myutil.myUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.json.simple.JSONObject;
 
 /**
  *
  * @author user
  */
-@WebServlet(urlPatterns = {"/hello"})
-public class hello extends HttpServlet {
+public class list extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,19 +32,29 @@ public class hello extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        new myUtil().test();
-        System.out.println("#########################");
+        HttpSession session = request.getSession();
+        JSONObject jo = new JSONObject();
+        String what = request.getParameter("what");
+        String data = request.getParameter("data");
+        //TODO: userid
+        String email = (String)session.getAttribute("email");
+        String id = (String)session.getAttribute("userid");
+        if (email == null || id == null){
+            response.sendRedirect("login?invalid=login%20again");
+            return;
+        }
+        if (what == null) {
+            jo.put("message", "what do you want to list?");
+        }else if(what.equals("company")){
+            jo = new myUtil().getCompanyList(id);
+        }else if(what.equals("users")){
+            jo = new myUtil().getUserList(data);
+        }else{
+            jo.put("message","are you sure you need that?");
+        }
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Sjjjjjervlet hello</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet hello at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
+            out.print(jo);
         }
     }
 
