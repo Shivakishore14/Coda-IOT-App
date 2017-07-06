@@ -51,6 +51,10 @@
                     </div>
                 </div>
             </div>
+
+            <center>
+                Already have an account? <a href="login.jsp">click here</a>
+            </center>
         </div>
         <div id="notification" class="container-fluid">
             <div class="row">

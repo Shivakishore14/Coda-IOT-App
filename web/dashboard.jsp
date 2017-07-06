@@ -12,12 +12,10 @@
     HttpSession s = request.getSession();
     String id = (String) s.getAttribute("userid");
     String name = (String) s.getAttribute("name");
-    String newCompany = (String) s.getAttribute("company");
-    String company = (String) session.getAttribute("company");
-    if (newCompany != null) {
-        session.setAttribute("company", newCompany);
-        company = newCompany;
-    }
+    String CNAME = (String) s.getAttribute("cname");
+    String CID = (String) s.getAttribute("cid");
+    String SECRET = (String) s.getAttribute("secret");
+    
     if (id == null) {
         response.sendRedirect("login.jsp?ivalid=please login");
     }
@@ -68,33 +66,38 @@
                         </div>-->
                         <%
                             myUtil m = new myUtil();
-                            JSONObject jo = m.getCompanyList(id);
-                            JSONArray companies = (JSONArray) jo.get("data");
-                            boolean flag = true;
-                            if (companies != null) {
-                                for (Object a : companies) {
-                                    flag = false;
-                                    JSONObject t = (JSONObject) a;
-                                    String cname = (String) t.get("name");
-                                    int cid = (int) t.get("cid");
+                            //out.print(id);
+                            if (id != null){
+                                JSONObject jo = m.getCompanyList(id);
+                                JSONArray companies = (JSONArray) jo.get("data");
+                                boolean flag = true;
+                                if (companies != null) {
+                                    for (Object a : companies) {
+                                        flag = false;
+                                        JSONObject t = (JSONObject) a;
+                                        String cname = (String) t.get("name");
+                                        int cid = (int) t.get("cid");
+                                        String secret = (String) t.get("secret");
                         %>
                         <div class="list-group">
-                            <button type="button" class="list-group-item " cid="<%= cid %>" onClick="companyClicked(this)"><%= cname %></button>
+                            <button type="button" class="list-group-item " secret="<%= secret %>" cid="<%= cid %>" onClick="companyClicked(this)"><%= cname %></button>
                         </div>
                         <%
+                                    }
                                 }
-                            }
-                            if (flag) {
+                                if (flag) {
                         %>
                         <div class="list-group">
                             <button type="button" class="list-group-item">No companies</button>
                         </div>
                         <%
+                                }
                             }
                         %>
                     </div>
                     <button type="button" id="btnNew" class="btn btn-info full-width"  data-toggle="modal" data-target="#myModal">Create New Company</button><br>
                     <br>
+                    
                     <div id="userRoot">
                         <div class="panel panel-primary" id="userlist">
                             <div class="panel-heading " id="testHead"><b>Users</b></div>
@@ -154,11 +157,13 @@
                         <input type="text" class="form-control" placeholder="city" id="newCompanyCity"><br>
                         <input type="text" class="form-control" placeholder="state" id="newCompanyState"><br>
                         <input type="text" class="form-control" placeholder="country" id="newCompanyCountry"><br>
+                        <input type="text" class="form-control" placeholder="Secret" id="newCompanySecret">
+                        <button onClick="generateSecret()" class="btn full-width">Generate Secret</button><br>
                         <div id="modalNotification">Status</div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="btnCreateNew">Create Company</button>
+                        <button type="button" class="btn btn-primary" id="btnCreateNew" onClick="createCompany()">Create Company</button>
                     </div>
                 </div>
             </div>
@@ -185,7 +190,7 @@
                             </select>
                         </div>
                         <hr>
-                        Use Key : <span id="deviceKey">##</span>
+                        Use Secret : <span id="deviceKey">##</span>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-primary" data-dismiss="modal" id="btnCreateNew" onClick="createSensor()">Create Device</button>
@@ -220,18 +225,27 @@
     <script>
         $("#companyRoot").hide();
         $("#userRoot").hide();
+        $("#sensorRoot").hide();
         var CID = - 1;
+        var SECRET = "";
+        var UID = -1;
         MyChart = {};
         var ctx = document.getElementById("graph").getContext('2d');
         var chart = new Chart(ctx, {
         type: 'line',
                 data: {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                        datasets: [{
-                        label: 'Data received',
-                                data: [12, 19, 3, 5, 2, 3],
-                                borderWidth: 1
-                        }]
+                    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                    datasets: [{
+                    label: 'Data received',
+                            data: [12, 19, 3, 5, 2, 3],
+                            borderWidth: 1
+                    },
+                    {
+                    label: 'Data 2',
+                            data: [1, 9, 13, 15, 12, 3],
+                            borderWidth: 1
+                    }
+                    ]
                 },
                 options: {
                     scales: {
@@ -255,7 +269,7 @@
         function updateChart(labels, dataset){
             chart.data.labels = labels;
             chart.data.datasets = [dataset];
-            chart.update();
+            chart.update(0);
         }
         function fmtDate(ts){
             var options = {
@@ -276,18 +290,25 @@
             }
             updateChart(tim, getDataSet(val, sid));
         }
-        function getSensorData(sid){
-            $.get("sensor", {"action":"get", "id":sid}, function(result){
+        function getSensorData(){
+            console.log(INTERVAL);
+            $.get("sensor", {"action":"get", "id":SENSOR_ID}, function(result){
                 result = JSON.parse(result);
                 if (result.message == "done"){
-                    loadSensorData(result.data, sid);
+                    loadSensorData(result.data, SENSOR_ID);
                 } else{
                     notify(result.message);
                 }
             });
         }
+        var INTERVAL = -1;
+        var SENSOR_ID;
         function handleSensorClick(id){
-            getSensorData(id);
+            SENSOR_ID = id;
+            if (INTERVAL != -1){
+                clearInterval(INTERVAL);
+            }
+            INTERVAL = setInterval(getSensorData, 1000);
         }
         function renderSensorList(data) {
             s = '<div class="panel-heading " id="testHead"><b>Sensors</b><span class="glyphicon glyphicon-plus-sign add" data-toggle="modal" data-target="#newDeviceModal"></span></div>';
@@ -306,6 +327,9 @@
             $.get("sensor", {"action": "list", "cid": cid}, function (result) {
                 result = JSON.parse(result);
                 if (result.message == "done") {
+//                    if(result.data.length>0){
+//                        $("#sensorRoot").show();
+//                    }
                     renderSensorList(result.data);
                 } else {
                     notify(result.message);
@@ -317,6 +341,9 @@
 //              console.log(result);
                 result = JSON.parse(result);
                 if (result.message == "done"){
+//                    if(result.data.length > 0){
+//                        $("#userRoot").show();
+//                    }
                     s = '<div class="panel-heading " id="testHead"><b>Users</b><span class="glyphicon glyphicon-plus-sign add" data-toggle="modal" data-target="#newUserModal"></span></div>';
                     for (i in result.data){
                         s = s + `
@@ -336,14 +363,33 @@
             $("#cname").html(cname);
             $("#companyRoot").show();
             $("#userRoot").show();
+            $("#userRoot").show();
+            $("#sensorRoot").show();
             loadSensors(cid);
-            loadUsers(cid);
+            $.get("company",{action:"isadmin", cid:CID, uid:UID},function(result){
+                result = JSON.parse(result);
+                console.log(result);
+                $("#userRoot").hide();
+                if (result.message == "done"){
+                    if(result.data == true){
+                        $("#userRoot").show();
+                        loadUsers(cid);
+                    }
+                }
+            });
+            
+            $("#deviceKey").html(SECRET);
         }
         function companyClicked(a) {
             var cid = $(a).attr("cid");
             var cname = $(a).html();
             CID = cid;
+            SECRET = $(a).attr("secret");
+            $.get("company",{action:"set",cname:cname, cid:cid, secret:SECRET},function(result){
+                //console.log(result);
+            })
             changeCompany(cname, cid);
+        
         }
         function createSensor(){
             type = $("#newSensorType").val();
@@ -368,6 +414,51 @@
                 }
             });
         }
+        function createCompany(){
+            var obj = {};
+            obj.what = "addCompany";
+            obj.addr1 = $("#newCompanyAddress1").val();
+            obj.addr2 = $("#newCompanyAddress2").val();
+            obj.city = $("#newCompanyCity").val();
+            obj.state = $("#newCompanyState").val();
+            obj.country = $("#newCompanyCountry").val();
+            obj.cname = $("#newCompanyName").val();
+            obj.secret = $("#newCompanySecret").val();
+            console.log(obj);
+            $.get("addnew", obj, function(result){
+                result = JSON.parse(result);
+                console.log(result);
+                if (result.message == "done"){
+                    notify("company created");
+                }else{
+                    notify(result.message);
+                }
+            });
+        }
+        function generateSecret(){
+             $("#newCompanySecret").val(makeHash());
+        }
+        function makeHash() {
+            var text = "";
+            var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+            for (var i = 0; i < 8; i++)
+                text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+            return text;
+        }
+        <%
+            if(CNAME != null && CID != null && SECRET != null){
+                %>
+                var cid = <%= CID%>;
+                var cname = "<%= CNAME%>";
+                SECRET = "<%= SECRET%>";
+                UID = "<%= id%>"
+                CID = cid;
+                changeCompany(cname, cid);
+                <%
+            }
+        %>
     </script>
 </html>
 

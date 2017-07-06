@@ -36,10 +36,11 @@
                             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
                             <input id="password" type="password" class="form-control" name="password" placeholder="Password">
                         </div>
-                        <div class="input-group row full-width">
-                            <div class="col-md-4 col-md-offset-4">
-                                <input type="submit" class="btn btn-info full-width"/>
-                            </div>
+                        <div class="row full-width">
+                            <center class="col-md-offset-4">
+                                
+                                <input type="submit" class="btn btn-info"/>
+                            </center>
                         </div>
                         <% 
                             String t = request.getParameter("invalid");
@@ -48,6 +49,9 @@
                             }
                         %>
                     </form>
+                    <center>
+                        Don't have an account? <a href="signup.jsp">click here</a>
+                    </center>
                 </div>
             </div>
         </div>

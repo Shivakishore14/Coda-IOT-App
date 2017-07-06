@@ -7,6 +7,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +19,8 @@ import org.json.simple.JSONObject;
  *
  * @author user
  */
-public class addnew extends HttpServlet {
+@WebServlet(urlPatterns = {"/company"})
+public class company extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,60 +35,30 @@ public class addnew extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession session = request.getSession();
+        String cname = request.getParameter("cname");
+        String cid = request.getParameter("cid");
+        String secret = request.getParameter("secret");
+        String uid = request.getParameter("uid");
+        String action = request.getParameter("action");
         JSONObject jo = new JSONObject();
-        String what = request.getParameter("what");
-        String data = request.getParameter("data");
-        String id = (String)session.getAttribute("userid");
         jo.put("message","done");
-        if(id == null){
-            jo.put("message","not authenticated");
-            
-        }else{
+       
+        if(action!=null){
             myUtil m = new myUtil();
-            if(what == null){
-                jo.put("message","what is that you need?");
-            }else if(what.equals( "getId")){
-                int uid = m.getUserId(data);
-                jo.put("data", uid);
-            }else if(what.equals( "adduser")){
-                int uid = m.getUserId(data);
-                System.out.println("data : "+data+uid);
-                String cid1 = (String)session.getAttribute("cid");
-                if(m.isAdmin(id, cid1)){
-                    if(uid <= 0){
-                        //TODO invite
-                        m.SendSimple(data);
-                        jo.put("message", "invite sent");
-                    }else{
-                        String cid = request.getParameter("cid");
-                        jo = m.addUser(Integer.toString(uid), cid, "user");
-                        jo.put("debug", "adduser");
-                    }
-                }else{
-                    jo.put("message","not authenticated");
-                }
-            }else if(what.equals("addCompany")){
-                String cname = request.getParameter("cname");
-                String secret = request.getParameter("secret");
-                String addr1 = request.getParameter("addr1");
-                String addr2 = request.getParameter("addr2");
-                String city = request.getParameter("city");
-                String state = request.getParameter("state");
-                String country = request.getParameter("country");
-                
-                jo = m.newCompany(cname, secret, addr1, addr2, city, state, country);
-                if(((String)jo.get("message")).equals("done")){
-                    int cid = m.getCompanyId(cname);
-                    jo = m.addUser(id, Integer.toString(cid), "admin");
-                }else{
-                    jo.put("message1", "admin not assigned");
-                }
-            }else{
-                jo.put("debug", what);
+            if (action.equals("isadmin")){
+                jo.put("data", m.isAdmin(uid, cid));
+            }else if(action.equals("set")){
+                if (cname != null)
+                    session.setAttribute("cname", cname);
+                if (cid != null)
+                    session.setAttribute("cid", cid);
+                if (secret != null)
+                    session.setAttribute("secret", secret);
             }
         }
         try (PrintWriter out = response.getWriter()) {
-            out.print(jo);
+            /* TODO output your page here. You may use following sample code. */
+            out.println(jo);
         }
     }
 
