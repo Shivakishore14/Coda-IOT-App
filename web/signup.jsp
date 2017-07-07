@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </div>
-
+            <br>
             <center>
                 Already have an account? <a href="login.jsp">click here</a>
             </center>

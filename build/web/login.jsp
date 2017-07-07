@@ -37,10 +37,11 @@
                             <input id="password" type="password" class="form-control" name="password" placeholder="Password">
                         </div>
                         <div class="row full-width">
-                            <center class="col-md-offset-4">
-                                
+                            <center class="col-md-offset-1">
+                                <br>
                                 <input type="submit" class="btn btn-info"/>
                             </center>
+                            <br>
                         </div>
                         <% 
                             String t = request.getParameter("invalid");

@@ -65,7 +65,7 @@
                                                 int cid = (int) t.get("cid");
                                                 String secret = (String) t.get("secret");
                                 %>
-                                <li>
+                                <li class="list-elt">
                                     <a href="#" secret="<%= secret %>" cid="<%= cid %>" onClick="companyClicked(this)"><%= cname %></a>
                                 </li>
                                 <%
@@ -73,7 +73,10 @@
                                         }
                                     }
                                 %>
-                                <li></li>
+                                <li role="separator" class="divider"></li>
+                                <li>
+                                    <a href="#" id="btnNew" class="btn full-width"  data-toggle="modal" data-target="#myModal">Create New Company</a>
+                                </li>
                             </ul>
                         </li>
                         <li class="dropdown">
@@ -427,6 +430,7 @@
                 result = JSON.parse(result);
                 if (result.message == "done"){
                     notify("done");
+                    loadUsers(CID);
                 }else{
                     $('#newUserModal').modal('show');
                     notify(result.message);
