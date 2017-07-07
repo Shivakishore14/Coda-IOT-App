@@ -19,6 +19,7 @@
     if (id == null) {
         response.sendRedirect("login.jsp?ivalid=please login");
     }
+    myUtil m = new myUtil();
 %>
 <!DOCTYPE html>
 <html>
@@ -47,6 +48,35 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><span class="cname">select company</span> <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <%
+                            
+                                    //out.print(id);
+                                    if (id != null){
+                                        JSONObject jo = m.getCompanyList(id);
+                                        JSONArray companies = (JSONArray) jo.get("data");
+                                        boolean flag = true;
+                                        if (companies != null) {
+                                            for (Object a : companies) {
+                                                flag = false;
+                                                JSONObject t = (JSONObject) a;
+                                                String cname = (String) t.get("name");
+                                                int cid = (int) t.get("cid");
+                                                String secret = (String) t.get("secret");
+                                %>
+                                <li>
+                                    <a href="#" secret="<%= secret %>" cid="<%= cid %>" onClick="companyClicked(this)"><%= cname %></a>
+                                </li>
+                                <%
+                                            }
+                                        }
+                                    }
+                                %>
+                                <li></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><% out.print(name); %> <span class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 <li><a href="login.jsp">Log out</a></li>
@@ -59,13 +89,10 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-3">
-                    <div class="panel panel-primary">
+                    <!--div class="panel panel-primary">
                         <div class="panel-heading " id="testHead"><b>Companies</b></div>
-                        <!--<div class="list-group">
-                            <button type="button" class="list-group-item">Loading</button>
-                        </div>-->
                         <%
-                            myUtil m = new myUtil();
+                            
                             //out.print(id);
                             if (id != null){
                                 JSONObject jo = m.getCompanyList(id);
@@ -96,7 +123,7 @@
                         %>
                     </div>
                     <button type="button" id="btnNew" class="btn btn-info full-width"  data-toggle="modal" data-target="#myModal">Create New Company</button><br>
-                    <br>
+                    <br-->
                     
                     <div id="userRoot">
                         <div class="panel panel-primary" id="userlist">
@@ -122,7 +149,7 @@
                     </div>
                     <div class="jumbotron" id="companyRoot">
                         <div>
-                            <h2 id="cname">Company Name</h2>
+                            <h2 class="cname">Company Name</h2>
                         </div>
                         <hr>
                         <div id="dataGraphRoot">
@@ -229,23 +256,14 @@
         var CID = - 1;
         var SECRET = "";
         var UID = -1;
+        var CNAME = "";
         MyChart = {};
         var ctx = document.getElementById("graph").getContext('2d');
         var chart = new Chart(ctx, {
         type: 'line',
                 data: {
-                    labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                    datasets: [{
-                    label: 'Data received',
-                            data: [12, 19, 3, 5, 2, 3],
-                            borderWidth: 1
-                    },
-                    {
-                    label: 'Data 2',
-                            data: [1, 9, 13, 15, 12, 3],
-                            borderWidth: 1
-                    }
-                    ]
+                    labels: [],
+                    datasets: []
                 },
                 options: {
                     scales: {
@@ -337,7 +355,7 @@
             });
         }
         function loadUsers(cid){
-            $.get("list",{what:"users", data:$("#cname").html()}, function(result){
+            $.get("list",{what:"users", data:CNAME}, function(result){
 //              console.log(result);
                 result = JSON.parse(result);
                 if (result.message == "done"){
@@ -360,11 +378,12 @@
         }
         function changeCompany(cname, cid) {
             $("#defaultCompanyNotselected").hide();
-            $("#cname").html(cname);
+            $(".cname").html(cname);
             $("#companyRoot").show();
             $("#userRoot").show();
             $("#userRoot").show();
             $("#sensorRoot").show();
+            CNAME =cname;
             loadSensors(cid);
             $.get("company",{action:"isadmin", cid:CID, uid:UID},function(result){
                 result = JSON.parse(result);
@@ -453,12 +472,17 @@
                 var cid = <%= CID%>;
                 var cname = "<%= CNAME%>";
                 SECRET = "<%= SECRET%>";
-                UID = "<%= id%>"
                 CID = cid;
                 changeCompany(cname, cid);
                 <%
             }
+            if (id != null){
+                %>
+                UID = "<%= id%>"    
+                <%
+            }
         %>
+            
     </script>
 </html>
 

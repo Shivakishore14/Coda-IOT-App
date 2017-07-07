@@ -47,6 +47,32 @@ INSERT INTO `company` VALUES (1,'coda','testHash123','','','','',''),(2,'MyComp1
 UNLOCK TABLES;
 
 --
+-- Table structure for table `invites`
+--
+
+DROP TABLE IF EXISTS `invites`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `invites` (
+  `email` varchar(50) NOT NULL,
+  `cid` int(11) DEFAULT NULL,
+  PRIMARY KEY (`email`),
+  KEY `cid` (`cid`),
+  CONSTRAINT `invites_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `company` (`cid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `invites`
+--
+
+LOCK TABLES `invites` WRITE;
+/*!40000 ALTER TABLE `invites` DISABLE KEYS */;
+INSERT INTO `invites` VALUES ('shivas@my.com',1);
+/*!40000 ALTER TABLE `invites` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `sensor_data`
 --
 
@@ -146,7 +172,7 @@ CREATE TABLE `user_company_mapping` (
 
 LOCK TABLES `user_company_mapping` WRITE;
 /*!40000 ALTER TABLE `user_company_mapping` DISABLE KEYS */;
-INSERT INTO `user_company_mapping` VALUES (2,1,'user'),(10,1,'admin'),(10,2,'admin'),(10,3,'user'),(33,1,'user'),(33,3,'user'),(34,3,'admin');
+INSERT INTO `user_company_mapping` VALUES (2,1,'user'),(10,1,'admin'),(10,2,'admin'),(10,3,'user'),(33,1,'user'),(33,3,'user'),(34,3,'admin'),(35,1,'user');
 /*!40000 ALTER TABLE `user_company_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -166,7 +192,7 @@ CREATE TABLE `users` (
   `password` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -175,7 +201,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,NULL,NULL,NULL,NULL,NULL),(2,'jhgj','hgjh','jhg','gjh','gjh'),(4,'7','7','jhg2','7','hjhg'),(5,'','','','',''),(10,'shiva','s','shiva@my.com','9090090099','kishore'),(33,'shiva','kishore','shivakishore@my.com','9090909090','kishore'),(34,'kishore','sekhar','kishore@my.com','90909090','kishore');
+INSERT INTO `users` VALUES (1,NULL,NULL,NULL,NULL,NULL),(2,'jhgj','hgjh','jhg','gjh','gjh'),(4,'7','7','jhg2','7','hjhg'),(5,'','','','',''),(10,'shiva','s','shiva@my.com','9090090099','kishore'),(33,'shiva','kishore','shivakishore@my.com','9090909090','kishore'),(34,'kishore','sekhar','kishore@my.com','90909090','kishore'),(35,'shiva ','s','shivas@my.com','989898999','kishore');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -188,4 +214,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-07-06 18:34:14
+-- Dump completed on 2017-07-07 11:12:28

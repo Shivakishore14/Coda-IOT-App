@@ -13,7 +13,7 @@ package myutil;
 import java.sql.*;  
 import org.json.simple.*;
 import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.ClientBuilder;  
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
 
@@ -77,7 +77,10 @@ public class myUtil {
             stmt.setString(5, password);
             //System.out.println(email+fname+lname+phone+password);
             //stmt.execute();
-            return stmt.executeUpdate();
+            int t = stmt.executeUpdate();
+            if (t == 1)
+                addInvitedUserToCompany(email);
+            return t;
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -423,6 +426,46 @@ public class myUtil {
         
     return false;
     }
+    public JSONObject addInvite(String email, String cid){
+        JSONObject jo = new JSONObject();
+        jo.put("message","done");
+        try{
+            int Cid = Integer.parseInt(cid);
+            PreparedStatement stmt = con.prepareStatement("insert into invites(email,cid) values(?,?);");
+            
+            stmt.setString(1, email);
+            stmt.setInt(2, Cid);
+            
+            int t = stmt.executeUpdate();
+            if (t != 1)
+                jo.put("Message", "user already invited");
+            
+        }catch(Exception e){
+            e.printStackTrace();
+            jo.put("message","error");
+        }
+        return jo;
+    }
+    public JSONObject addInvitedUserToCompany(String email){
+        JSONObject jo = new JSONObject();
+        jo.put("message","done");
+        try{
+            int uid = getUserId(email);
+            PreparedStatement stmt = con.prepareStatement("select cid from invites where email = ?");
+            stmt.setString(1, email);
+            ResultSet rs = stmt.executeQuery();
+            int cid = 0;
+            if(rs.next()){
+                cid = rs.getInt("cid");
+                jo = addUser(Integer.toString(uid), Integer.toString(cid), "user");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            jo.put("message","error");
+        }
+        return jo;
+    }
+    
     public ClientResponse SendSimple(String to) {
 
         Client client = ClientBuilder.newClient();

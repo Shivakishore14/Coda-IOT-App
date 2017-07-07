@@ -53,12 +53,14 @@ public class addnew extends HttpServlet {
                 System.out.println("data : "+data+uid);
                 String cid1 = (String)session.getAttribute("cid");
                 if(m.isAdmin(id, cid1)){
+                    String cid = request.getParameter("cid");
                     if(uid <= 0){
                         //TODO invite
+                        m.addInvite(data, cid);
                         m.SendSimple(data);
                         jo.put("message", "invite sent");
                     }else{
-                        String cid = request.getParameter("cid");
+                        
                         jo = m.addUser(Integer.toString(uid), cid, "user");
                         jo.put("debug", "adduser");
                     }
