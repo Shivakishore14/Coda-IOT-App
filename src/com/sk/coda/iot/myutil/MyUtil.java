@@ -23,13 +23,18 @@ import org.json.simple.*;
 //import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 //import com.sun.jersey.api.client.ClientResponse;
 public class MyUtil {
-    private String DB_USERNAME = "test";
-    private String DB_PASSWORD = "test";
-    private String DB_NAME = "coda";
+    private static String DB_USERNAME ;
+    private static String DB_PASSWORD ;
+    private static String DB_NAME ;
     private Connection con;
     private Statement stmt;
     public MyUtil(){
         try{
+        	DB_USERNAME = System.getenv("DB_USER");
+        	DB_PASSWORD = System.getenv("DB_PASS");
+        	DB_NAME = System.getenv("CODA_IOT_DB_NAME");
+        	
+        	
             Class.forName("com.mysql.jdbc.Driver");
             con=DriverManager.getConnection("jdbc:mysql://localhost:3306/"+DB_NAME,DB_USERNAME,DB_PASSWORD);  
             stmt=con.createStatement();
