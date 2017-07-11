@@ -16,9 +16,11 @@
         <title>SignUp Page</title>
     </head>
     <body>
+        <jsp:include page="topNav.jsp" />
         <center>
             <h1>SignUp</h1>
         </center>
+        
         <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">

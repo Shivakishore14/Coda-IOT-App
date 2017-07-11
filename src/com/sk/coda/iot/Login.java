@@ -5,65 +5,57 @@
  */
 package com.sk.coda.iot;
 
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import com.sk.coda.iot.myutil.MyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import org.json.simple.*;
+import com.sk.coda.iot.myutil.*;
 /**
  *
  * @author user
  */
 @WebServlet(urlPatterns = {"/login"})
 public class Login extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    @Override
+//	public void init(ServletConfig config) throws ServletException {
+//	    super.init(config);
+//	    try {
+//            MyLogger.setup();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            throw new RuntimeException("Problems with creating the log files");
+//        }
+//	}
+	//private final static Logger LOGGER = Logger.getLogger(Login.class.getName());
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+		LOGGER.setLevel(Level.INFO);
+        LOGGER.finest("Login Servlet Get Request");
+
     	HttpSession session = request.getSession();
         String option = (String) request.getAttribute("option");
         if("logout".equals(option)) {
+        	LOGGER.info("logged out user : " + (String)session.getAttribute("userid") );
         	session.invalidate();
         }
     	RequestDispatcher rd = request.getRequestDispatcher("login.jsp");
         rd.forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        LOGGER.setLevel(Level.SEVERE);
+        LOGGER.finest("POST on login servlet");
         HttpSession session = request.getSession(true);
         String email = request.getParameter("email");
         String password = request.getParameter("password");
@@ -76,8 +68,10 @@ public class Login extends HttpServlet {
             session.setAttribute("email", email);
             session.setAttribute("userid", id);
             session.setAttribute("name", name);
+            LOGGER.info("login attempt successfull user :"+email);
             response.sendRedirect("/codaiot/dashboard");
         }else{
+        	LOGGER.info("login attempt invalid user :" + email);
             session.invalidate();
             response.sendRedirect("/codaiot/login?invalid=try%20again");
         }

@@ -8,6 +8,8 @@ package com.sk.coda.iot;
 import com.sk.coda.iot.myutil.MyUtil;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -21,48 +23,27 @@ import org.json.simple.*;
  */
 @WebServlet(urlPatterns = {"/signup"})
 public class Signup extends HttpServlet {
-
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+	
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+    	LOGGER.setLevel(Level.SEVERE);
+    	LOGGER.finest("GET on signup servlet");
     	HttpSession session = request.getSession();
         session.invalidate();
     	RequestDispatcher rd= request.getRequestDispatcher("signup.jsp");
     	rd.forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
     	response.setContentType("text/html;charset=UTF-8");
-        HttpSession session = request.getSession();
+    	LOGGER.setLevel(Level.SEVERE);
+    	LOGGER.finest("POST on signup servlet");
+    	HttpSession session = request.getSession();
         session.invalidate();
         JSONObject jo = new JSONObject();
         PrintWriter out = response.getWriter();
@@ -73,8 +54,10 @@ public class Signup extends HttpServlet {
         String password = request.getParameter("password");
         int changes = new MyUtil().signup(email, lname, fname, password, phone);
         if (changes == 1){
+        	LOGGER.info("created user :" +email);
             jo.put("message", "done");
         }else{
+        	LOGGER.info("couldn't create user :"+email);
             jo.put("message","try again");
         }
         out.print(jo);

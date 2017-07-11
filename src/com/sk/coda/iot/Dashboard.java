@@ -1,6 +1,8 @@
 package com.sk.coda.iot;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -20,6 +22,8 @@ import com.sk.coda.iot.myutil.MyUtil;
  */
 @WebServlet("/dashboard")
 public class Dashboard extends HttpServlet {
+	private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+	
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -34,6 +38,8 @@ public class Dashboard extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		LOGGER.setLevel(Level.SEVERE);
+		LOGGER.finest("GET on Dashboard");
 		HttpSession s = request.getSession();
 	    String id = (String) s.getAttribute("userid");
 	    String name = (String) s.getAttribute("name");
@@ -42,11 +48,13 @@ public class Dashboard extends HttpServlet {
 	    String secret = (String) s.getAttribute("secret");
 	    
 		if (id == null) {
-	        response.sendRedirect("/codaiot/login?ivalid=please login");
-	    }else {
+	        LOGGER.severe("Access denied User not logged in");
+			response.sendRedirect("/codaiot/login?ivalid=please login");
+	        
+		}else {
 	    	request.setAttribute("userid", id);
 			request.setAttribute("name", name);
-			request.setAttribute("name", cname);
+			request.setAttribute("cname", cname);
 			request.setAttribute("cid", cid);
 			request.setAttribute("secret", secret);
 			MyUtil m = new MyUtil();

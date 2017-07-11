@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/core" prefix = "c" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -17,9 +18,11 @@
         <title>Login Page</title>
     </head>
     <body>
+    	<jsp:include page="topNav.jsp" />
         <center>
             <h1>Login</h1>
         </center>
+        
         <div class="container">
             <div class="row">
                 <div class="col-md-4 col-md-offset-4">
@@ -39,12 +42,14 @@
                             </center>
                             <br>
                         </div>
-                        <% 
-                            String t = request.getParameter("invalid");
-                            if( t != null){
-                                out.print("<br><div  class=\"list-group-item list-group-item-danger\">"+t+"</div>");
-                            }
-                        %>
+                        <c:choose>
+	                        <c:when test="${empty param.invalid}">
+	                        </c:when>
+	                        <c:otherwise>
+        						<br><div  class="list-group-item list-group-item-danger"><c:out value="${param.invalid}"></c:out></div>
+	                       </c:otherwise>
+	                    </c:choose>                        	
+                        
                     </form>
                     <center>
                         Don't have an account? <a href="/codaiot/signup">click here</a>
